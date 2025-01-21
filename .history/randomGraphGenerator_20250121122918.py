@@ -17,7 +17,7 @@ def gen_graph(n, prob):
         for node_j in range(n):
             if node_i == node_j or (node_i, node_j) in seen or (node_j, node_i) in seen:
                 continue
-            if random.uniform(0, 1) <= prob:
+            if random.uniform(0, 1) >= prob:
                 edge = (node_i, node_j, 1)
                 edges.append(edge)
                 seen.add((node_i, node_j))
