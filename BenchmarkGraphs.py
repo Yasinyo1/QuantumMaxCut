@@ -81,7 +81,7 @@ def setup_runtime():
 import time
 
 def run_quantum_implementation(graph, instance_name):
-    with open(f"{instance_name}.txt", "a") as result_file:
+    with open(f"results/{instance_name}.txt", "a") as result_file:
         result_file.write(f"----- Quantum Implementation Results for {instance_name} -----\n")
 
         initial_gamma = np.pi
@@ -134,7 +134,7 @@ def run_quantum_implementation(graph, instance_name):
 
 
 def run_classical_implementation(graph, instance_name):
-    with open(f"{instance_name}.txt", "a") as result_file:
+    with open(f"results/{instance_name}.txt", "a") as result_file:
         result_file.write(f"\n----- Classical Implementation Results for {instance_name} -----\n")
 
         start_time = time.time()
