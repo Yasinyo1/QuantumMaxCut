@@ -1,7 +1,6 @@
 import random
 import numpy as np
 import rustworkx as rx
-
 def gen_graph(n, prob):
     rnd_graph = rx.PyGraph()
     rnd_graph.add_nodes_from(np.arange(0, n, 1))
