@@ -39,8 +39,3 @@ def gen_graph(n, prob):
     graph = rx.networkx_converter(graph_nx)
 
     return graph
-
-# prob = [0.1,0.4]
-# for n in range(10,111,10):
-#     for p in prob:
-#         gen_graph(n,p)
