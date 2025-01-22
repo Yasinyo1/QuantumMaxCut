@@ -154,7 +154,7 @@ def benchmark_graph(graph, instance_name):
     run_classical_implementation(graph, instance_name)
 
 backend = setup_runtime()
-instanceName = '50nodes_0.4prob_798edges'
+instanceName = '30nodes_0.4prob_290edges'
 graph = load_graph(f"{instanceName}.dot")
 benchmark_graph(graph, instanceName)
 

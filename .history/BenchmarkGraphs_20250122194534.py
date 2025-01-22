@@ -75,7 +75,7 @@ def evaluate_sample(x: Sequence[int], graph: rx.PyGraph) -> float:
 def setup_runtime():
     QiskitRuntimeService.save_account(channel="ibm_quantum", token="3819a09e3b88f9f4fb3ab15059854c1a460441c2bec015eec1e32282b85fce1815cf675efe943f0a0e29f8bb2820df3e7cebc3330c7e9b25c6c97f0c23c203ff", overwrite=True, set_as_default=True)
     service = QiskitRuntimeService(channel='ibm_quantum')
-    backend = service.least_busy(min_num_qubits=127)
+    backend = service.backend(name='ibm_rensselaer')#service.least_busy(min_num_qubits=127)
     return backend
 
 import time
