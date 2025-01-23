@@ -72,10 +72,10 @@ def evaluate_sample(x: Sequence[int], graph: rx.PyGraph) -> float:
     assert len(x) == len(
         list(graph.nodes())), "The length of x must coincide with the number of nodes in the graph."
     return sum(x[u] * (1 - x[v]) + x[v] * (1 - x[u]) for u, v in list(graph.edge_list()))
-def setup_runtime():
-    QiskitRuntimeService.save_account(channel="ibm_quantum", token="b1b2f9f7bd7b616d0afc575a3b76d5ca7a98b0b1476b79b72c5b3ec9456035400edfbed7a23773f04b160f1a0cc0b520f6fc6464a1da0eff183f463fb2669b31", overwrite=True, set_as_default=True)
+def setup_runtime(backendName = None):
+    QiskitRuntimeService.save_account(channel="ibm_quantum", token="TOKEN", overwrite=True, set_as_default=True)
     service = QiskitRuntimeService(channel='ibm_quantum')
-    backend = service.least_busy(min_num_qubits=127)
+    backend = service.backend(name=backendName) if backendName else service.least_busy(min_num_qubits=127)
     return backend
 
 import time
@@ -153,9 +153,9 @@ def benchmark_graph(graph, instance_name):
     print(f"Running Classical Maximum Cut algorithm on instance {instance_name}")
     run_classical_implementation(graph, instance_name)
 
-backend = setup_runtime()
+backend = setup_runtime('ibm_kyiv')
 
-instanceName = '20nodes_0.1prob_44edges'
+instanceName = '50nodes_0.4prob_798edges'
 graph = load_graph(f"{instanceName}.dot")
 benchmark_graph(graph, instanceName)
 
