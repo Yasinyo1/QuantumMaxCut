@@ -44,3 +44,8 @@ def gen_graph(n, prob):
 # for n in range(10,111,10):
 #     for p in prob:
 #         gen_graph(n,p)
+
+gen_graph(20,0.1)
+gen_graph(20,0.4)
+gen_graph(40,0.1)
+gen_graph(40,0.4)
