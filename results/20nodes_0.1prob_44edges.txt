@@ -1,2 +1,0 @@
------ Quantum Implementation Results for 20nodes_0.1prob_44edges -----
------ Quantum Implementation Results for 20nodes_0.1prob_44edges -----
