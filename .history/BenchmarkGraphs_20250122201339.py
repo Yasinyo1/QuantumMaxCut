@@ -39,7 +39,7 @@ def get_cost_homiltonian(max_cut_paulis):
     return cost_hamiltonian
 
 
-def build_circuit(cost_hamiltonian,backend):
+def build_circuit(cost_hamiltonian):
     circuit = QAOAAnsatz(cost_operator=cost_hamiltonian, reps=1)
     circuit.measure_all()
     # Create pass manager for transpilation
@@ -81,49 +81,45 @@ def setup_runtime(backendName = None):
 
 import time
 
-
-def execute(graph,instance_name,backend):
-    
+def run_quantum_implementation(graph, instance_name):
     with open(f"results/{instance_name}.txt", "a") as result_file:
         result_file.write(f"----- Quantum Implementation Results for {instance_name} -----\n")
-        
+
+        initial_gamma = np.pi
+        initial_beta = np.pi / 2
+        init_params = [initial_gamma, initial_beta]
+        max_cut_paulist = build_max_cut_paulis(graph)
+        cost_hamiltonian = get_cost_homiltonian(max_cut_paulist)
+        candidate_circuit = build_circuit(cost_hamiltonian)
+
+
         with Session(backend=backend) as session:
             estimator = Estimator(mode=session)
-            estimator.options.default_shots = 10
+            estimator.options.default_shots = 1000
             estimator.options.dynamical_decoupling.enable = True
             estimator.options.dynamical_decoupling.sequence_type = "XY4"
-
-            initial_gamma = np.pi
-            initial_beta = np.pi / 2
-            init_params = [initial_gamma, initial_beta]
-            max_cut_paulist = build_max_cut_paulis(graph)
-            cost_hamiltonian = get_cost_homiltonian(max_cut_paulist)
-            candidate_circuit = build_circuit(cost_hamiltonian,backend)
 
             result = minimize(
                 cost_func_estimator,
                 init_params,
                 args=(candidate_circuit, cost_hamiltonian, estimator),
                 method="COBYLA",
-                tol=1e-1
+                tol=2e-1
             )
             result_file.write(f"Optimization Session details: {session.details()}\n")
             result_file.write(f"Optimization runtime usage: {session.details().get('usage_time')}s\n")
             result_file.write(f"Optimization result: {result}\n")
-            
-            optimized_circuit = candidate_circuit.assign_parameters(result.x)
-        
-        #Execute Circuit with optimized parameters
-        
+
+        optimized_circuit = candidate_circuit.assign_parameters(result.x)
         sampler = Sampler(mode=backend)
-        sampler.options.default_shots = 10
+        sampler.options.default_shots = 10000
         sampler.options.dynamical_decoupling.enable = True
         sampler.options.dynamical_decoupling.sequence_type = "XY4"
         sampler.options.twirling.enable_gates = True
         sampler.options.twirling.num_randomizations = "auto"
 
         pub = (optimized_circuit,)
-        job = sampler.run([pub], shots=10)
+        job = sampler.run([pub], shots=int(1e4))
         counts_int = job.result()[0].data.meas.get_int_counts()
 
         final_distribution_int = {key: val / sum(counts_int.values()) for key, val in counts_int.items()}
@@ -136,24 +132,6 @@ def execute(graph,instance_name,backend):
         result_file.write(f"Final bitstring distribution: {final_distribution_int}\n")
         result_file.write(f"Most likely bitstring: {most_likely_bitstring}\n")
         result_file.write(f"The value of the cut is: {cut_value}\n")
-
-def run_quantum_implementation():
-    backend = setup_runtime('ibm_kyiv')
-    instances = [10,30,50,70,90,110]
-    edges = [18,32,120,290,259,798,482,1558,823,2577,1255,3902]
-
-    for i in range(len(instances)):
-        if instances[i] != 10:
-            name_lo = str(instances[i]) + "nodes_"+ str(0.1) + "prob_" + str(edges[2*i]) + str("edges")
-        name_hi = str(instances[i]) + "nodes_"+ str(0.4) + "prob_" + str(edges[2*i + 1]) + str("edges")
-        if instances[i] != 10:
-            graph_lo = load_graph(f"{name_lo}.dot")
-        graph_hi = load_graph(f"{name_hi}.dot")
-        
-        #print(name_lo,name_hi)
-        if instances[i] != 10:
-            execute(graph_lo,name_lo,backend)
-        execute(graph_hi,name_hi,backend)
 
 
 def run_classical_implementation(graph, instance_name):
@@ -176,14 +154,11 @@ def benchmark_graph(graph, instance_name):
     print(f"Running Classical Maximum Cut algorithm on instance {instance_name}")
     run_classical_implementation(graph, instance_name)
 
+backend = setup_runtime('ibm_kyiv')
 
-
-run_quantum_implementation()
-
-# instanceName = '70nodes_0.1prob_482edges'
-# graph = load_graph(f"{instanceName}.dot")
-# benchmark_graph(graph, instanceName)
-
+instanceName = '50nodes_0.1prob_259edges'
+graph = load_graph(f"{instanceName}.dot")
+benchmark_graph(graph, instanceName)
 
 
 

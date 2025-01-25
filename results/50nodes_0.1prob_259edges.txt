@@ -1,0 +1,14 @@
+----- Quantum Implementation Results for 50nodes_0.1prob_259edges -----
+Optimization Session details: {'id': 'cya0jas01rbg008jphyg', 'backend_name': 'ibm_kyiv', 'interactive_timeout': 2, 'max_time': 900, 'active_timeout': 900, 'state': 'open', 'accepting_jobs': True, 'last_job_started': '2025-01-24T21:47:03.163Z', 'last_job_completed': '2025-01-24T21:47:26.350Z', 'started_at': '2025-01-24T21:42:11.435Z', 'closed_at': None, 'activated_at': '2025-01-24T21:42:11.435Z', 'mode': 'dedicated', 'usage_time': 33}
+Optimization runtime usage: 33s
+Optimization result:  message: Optimization terminated successfully.
+ success: True
+  status: 1
+     fun: -1.3921902582109766
+       x: [ 3.021e+00  1.400e+00]
+    nfev: 11
+   maxcv: 0.0
+Quantum Max Cut runtime usage: 5s
+Final bitstring distribution: {873845792563200: 0.1, 257028039168339: 0.1, 650691568480714: 0.1, 150180891434976: 0.1, 1111820270972768: 0.1, 1077631312769108: 0.1, 51495663654679: 0.1, 1002462764770721: 0.1, 844513930089905: 0.1, 875068060471379: 0.1}
+Most likely bitstring: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1]
+The value of the cut is: 108

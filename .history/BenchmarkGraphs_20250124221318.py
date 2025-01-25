@@ -82,7 +82,7 @@ def setup_runtime(backendName = None):
 import time
 
 
-def execute(graph,instance_name,backend):
+def execute(graph,instance_name,estimator,session,backend):
     
     with open(f"results/{instance_name}.txt", "a") as result_file:
         result_file.write(f"----- Quantum Implementation Results for {instance_name} -----\n")
@@ -143,16 +143,15 @@ def run_quantum_implementation():
     edges = [18,32,120,290,259,798,482,1558,823,2577,1255,3902]
 
     for i in range(len(instances)):
-        if instances[i] != 10:
-            name_lo = str(instances[i]) + "nodes_"+ str(0.1) + "prob_" + str(edges[2*i]) + str("edges")
+        name_lo = str(instances[i]) + "nodes_"+ str(0.1) + "prob_" + str(edges[2*i]) + str("edges")
         name_hi = str(instances[i]) + "nodes_"+ str(0.4) + "prob_" + str(edges[2*i + 1]) + str("edges")
-        if instances[i] != 10:
-            graph_lo = load_graph(f"{name_lo}.dot")
+
+        graph_lo = load_graph(f"{name_lo}.dot")
         graph_hi = load_graph(f"{name_hi}.dot")
         
-        #print(name_lo,name_hi)
-        if instances[i] != 10:
-            execute(graph_lo,name_lo,backend)
+        print(name_lo,name_hi)
+        
+        execute(graph_lo,name_lo,backend)
         execute(graph_hi,name_hi,backend)
 
 

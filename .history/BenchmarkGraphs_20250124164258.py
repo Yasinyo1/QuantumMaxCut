@@ -82,36 +82,29 @@ def setup_runtime(backendName = None):
 import time
 
 
-def execute(graph,instance_name,backend):
-    
+def execute(graph,instance_name,estimator,session,backend):
     with open(f"results/{instance_name}.txt", "a") as result_file:
         result_file.write(f"----- Quantum Implementation Results for {instance_name} -----\n")
+
+        initial_gamma = np.pi
+        initial_beta = np.pi / 2
+        init_params = [initial_gamma, initial_beta]
+        max_cut_paulist = build_max_cut_paulis(graph)
+        cost_hamiltonian = get_cost_homiltonian(max_cut_paulist)
+        candidate_circuit = build_circuit(cost_hamiltonian,backend)
+
+        result = minimize(
+            cost_func_estimator,
+            init_params,
+            args=(candidate_circuit, cost_hamiltonian, estimator),
+            method="COBYLA",
+            tol=1e-1
+        )
+        result_file.write(f"Optimization Session details: {session.details()}\n")
+        result_file.write(f"Optimization runtime usage: {session.details().get('usage_time')}s\n")
+        result_file.write(f"Optimization result: {result}\n")
         
-        with Session(backend=backend) as session:
-            estimator = Estimator(mode=session)
-            estimator.options.default_shots = 10
-            estimator.options.dynamical_decoupling.enable = True
-            estimator.options.dynamical_decoupling.sequence_type = "XY4"
-
-            initial_gamma = np.pi
-            initial_beta = np.pi / 2
-            init_params = [initial_gamma, initial_beta]
-            max_cut_paulist = build_max_cut_paulis(graph)
-            cost_hamiltonian = get_cost_homiltonian(max_cut_paulist)
-            candidate_circuit = build_circuit(cost_hamiltonian,backend)
-
-            result = minimize(
-                cost_func_estimator,
-                init_params,
-                args=(candidate_circuit, cost_hamiltonian, estimator),
-                method="COBYLA",
-                tol=1e-1
-            )
-            result_file.write(f"Optimization Session details: {session.details()}\n")
-            result_file.write(f"Optimization runtime usage: {session.details().get('usage_time')}s\n")
-            result_file.write(f"Optimization result: {result}\n")
-            
-            optimized_circuit = candidate_circuit.assign_parameters(result.x)
+        optimized_circuit = candidate_circuit.assign_parameters(result.x)
         
         #Execute Circuit with optimized parameters
         
@@ -142,18 +135,23 @@ def run_quantum_implementation():
     instances = [10,30,50,70,90,110]
     edges = [18,32,120,290,259,798,482,1558,823,2577,1255,3902]
 
-    for i in range(len(instances)):
-        if instances[i] != 10:
-            name_lo = str(instances[i]) + "nodes_"+ str(0.1) + "prob_" + str(edges[2*i]) + str("edges")
-        name_hi = str(instances[i]) + "nodes_"+ str(0.4) + "prob_" + str(edges[2*i + 1]) + str("edges")
-        if instances[i] != 10:
-            graph_lo = load_graph(f"{name_lo}.dot")
-        graph_hi = load_graph(f"{name_hi}.dot")
+    with Session(backend=backend) as session:
+        estimator = Estimator(mode=session)
+        estimator.options.default_shots = 10
+        estimator.options.dynamical_decoupling.enable = True
+        estimator.options.dynamical_decoupling.sequence_type = "XY4"
         
-        #print(name_lo,name_hi)
-        if instances[i] != 10:
-            execute(graph_lo,name_lo,backend)
-        execute(graph_hi,name_hi,backend)
+        for i in range(len(instances)):
+            name_lo = str(instances[i]) + "nodes_"+ str(0.1) + "prob_" + str(edges[2*i]) + str("edges")
+            name_hi = str(instances[i]) + "nodes_"+ str(0.4) + "prob_" + str(edges[2*i + 1]) + str("edges")
+
+            graph_lo = load_graph(f"{name_lo}.dot")
+            graph_hi = load_graph(f"{name_hi}.dot")
+            
+            print(name_lo,name_hi)
+            
+            execute(graph_lo,name_lo,estimator,session,backend)
+            execute(graph_hi,name_hi,estimator,session,backend)
 
 
 def run_classical_implementation(graph, instance_name):
