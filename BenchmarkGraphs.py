@@ -185,5 +185,10 @@ run_quantum_implementation()
 # benchmark_graph(graph, instanceName)
 
 
+# instanceName = '90nodes_0.1prob_823edges'
+# graph = load_graph(f"{instanceName}.dot")
+# benchmark_graph(graph, instanceName)
+
+
 
 
